@@ -30,6 +30,8 @@ decl_storage! {
         // Persons get(fn persons): map hasher(blake2_128_concat) T::AccountId => PersonData;
         Persons get(fn persons): map hasher(blake2_128_concat) T::AccountId => (u32,u32,u32);
 
+        BloodData get(fn blood_data): map hasher(blake2_128_concat) T::AccountId => (u32,u32,u32,u32,u32,u32,u32);
+
         Thing1 get(fn thing1): u32;
         Thing2 get(fn thing2): u32;
     }
@@ -45,6 +47,12 @@ decl_event! {
 
         /// Event emitted when a person has been updated. [who]
         PersonUpdated(AccountId),
+
+        /// Event emitted when a person has been inserted blood data. [who]
+        BloodDataInserted(AccountId),
+
+        /// Event emitted when a person has been requested diabet prediction. [who]
+        PredictDiabet(AccountId),
 
         /// Set new value. [key] [value]
         ValueSet(u32, u32),
@@ -90,6 +98,42 @@ decl_module! {
 
             // Emit an event that the person was created.
             Self::deposit_event(RawEvent::PersonCreated(sender));
+        }
+
+        /// Allow a user to claim ownership of an unclaimed proof.
+        #[weight = 10_000]
+        fn insert_blood(origin, bp: u32, sr1: u32, sr2: u32, sr3: u32, sr4: u32, sr5: u32, sr6: u32) {
+            // Check that the extrinsic was signed and get the signer.
+            // This function will return an error if the extrinsic is not signed.
+            // https://substrate.dev/docs/en/knowledgebase/runtime/origin
+            let sender = ensure_signed(origin)?;
+
+            debug::info!("Insert blood data request from {:?}", sender);
+
+             // Store the proof with the sender and block number.
+            BloodData::<T>::insert(&sender,(bp,sr1,sr2,sr3,sr4,sr5,sr6));
+
+            // Emit an event that the person was created.
+            Self::deposit_event(RawEvent::BloodDataInserted(sender));
+        }
+
+        /// Allow a user to claim ownership of an unclaimed proof.
+        #[weight = 20_000]
+        fn prdict_diabet(origin) {
+            // Check that the extrinsic was signed and get the signer.
+            // This function will return an error if the extrinsic is not signed.
+            // https://substrate.dev/docs/en/knowledgebase/runtime/origin
+            let sender = ensure_signed(origin)?;
+
+            debug::info!("Predict diabet request from {:?}", sender);
+
+
+            // let val: f64 = 0.1 * thread_rng().sample::<f64,_>(StandardNormal);
+            let val: f64 = 0.088;
+
+
+            debug::info!("{}", val);
+
         }
 
         /// Sets the first simple storage value

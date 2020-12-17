@@ -63,9 +63,9 @@ where
 
     // Add a second RPC extension
     // Because this one calls a Runtime API it needs a reference to the client.
-    io.extend_with(pallet_template_rpc::SumStorageApi::to_delegate(
+    /*io.extend_with(pallet_template_rpc::SumStorageApi::to_delegate(
         pallet_template_rpc::SumStorage::new(client),
-    ));
+    ));*/
 
     // Extend this RPC with a custom API by using the following syntax.
     // `YourRpcStruct` should have a reference to a client, which is needed
